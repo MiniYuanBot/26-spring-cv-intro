@@ -23,17 +23,22 @@ def padding(img, padding_size, type):
         padding_img[padding_size:H_padded - padding_size,
                     padding_size:W_padded - padding_size] = img
     elif type == "replicatePadding":
-        # generate the row indices of padding_img
-        row_idx = np.arange(H_padded) - padding_size
-        # [-padding_size, H + padding_size - 1]
-        row_idx = np.clip(row_idx, 0, H - 1)
-
-        # generate the colomn indices of padding_img
-        col_idx = np.arange(W_padded) - padding_size
-        # [-padding_size, W + padding_size - 1]
-        col_idx = np.clip(col_idx, 0, W - 1)
-
-        padding_img = img[np.ix_(row_idx, col_idx)]
+        # center
+        padding_img[padding_size:H_padded - padding_size,
+                    padding_size:W_padded - padding_size] = img
+        # edge
+        padding_img[0:padding_size, padding_size:W + padding_size] = img[0:1, :]  # up
+        padding_img[H + padding_size:, padding_size:W +
+                    padding_size] = img[-1:, :]  # down
+        padding_img[padding_size:H + padding_size,
+                    0:padding_size] = img[:, 0:1]  # left
+        padding_img[padding_size:H + padding_size,
+                    W + padding_size:] = img[:, -1:]  # right
+        # corner
+        padding_img[0:padding_size, 0:padding_size] = img[0, 0]  # left up
+        padding_img[0:padding_size, W + padding_size:] = img[0, -1]  # right up
+        padding_img[H + padding_size:, 0:padding_size] = img[-1, 0]  # left down
+        padding_img[H + padding_size:, W + padding_size:] = img[-1, -1]  # right down
 
     return padding_img
 

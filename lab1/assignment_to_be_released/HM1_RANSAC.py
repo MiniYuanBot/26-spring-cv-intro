@@ -19,8 +19,8 @@ if __name__ == "__main__":
     min_sample = 3
 
     # the minimal time that can guarantee the probability of at least one hypothesis does not contain any outliers is larger than 99.9%
-    sample_time = int(np.log(1 - confidence) /
-                      np.log(1 - (1 - outlier_ratio) ** min_sample))
+    sample_time = int(np.ceil(np.log(1 - confidence) /
+                              np.log(1 - (1 - outlier_ratio) ** min_sample)))
     distance_threshold = 0.05
 
     # sample points group
@@ -32,11 +32,13 @@ if __name__ == "__main__":
     vec1_in_plane = sample_group[:, 0] - sample_group[:, 1]
     vec2_in_plane = sample_group[:, 0] - sample_group[:, 2]
     normal_group = np.cross(vec1_in_plane, vec2_in_plane)  # (sample_time, 3)
+    normal_norm_group = np.sqrt(
+        np.sum(normal_group * normal_group, axis=1))  # (sample_time,)
     D_group = - np.sum(normal_group * sample_group[:, 0], axis=1)  # (sample_time,)
 
     # evaluate inliers (with point-to-plance distance < distance_threshold)
-    residual_group = np.dot(normal_group, noise_points.T) + \
-        D_group[:, None]  # (sample_time, 130)
+    residual_group = (normal_group @ noise_points.T + D_group[:, None])
+    residual_group = residual_group / normal_norm_group[:, None]  # (sample_time, 130)
     inliner_mask = (residual_group < distance_threshold) & (
         residual_group > -distance_threshold)
     inliner_tot_group = np.sum(inliner_mask, axis=1)  # (sample_time,)

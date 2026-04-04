@@ -23,9 +23,10 @@ def corner_response_function(input_img, window_size, alpha, threshold):
     grad_x = Sobel_filter_x(input_img)
     grad_y = Sobel_filter_y(input_img)
 
-    I_xx = grad_x * grad_x
-    I_yy = grad_y * grad_y
-    I_xy = grad_x * grad_y
+    # Padding first to keep dims
+    I_xx = padding(grad_x * grad_x, window_size//2, "replicatePadding")
+    I_yy = padding(grad_y * grad_y, window_size//2, "replicatePadding")
+    I_xy = padding(grad_x * grad_y, window_size//2, "replicatePadding")
 
     window = np.ones((window_size, window_size))
     S_xx = convolve(I_xx, window)
