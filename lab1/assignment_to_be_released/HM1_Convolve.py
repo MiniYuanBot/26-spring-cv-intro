@@ -79,17 +79,11 @@ def convol_with_Toeplitz_matrix(img, kernel):
     # 第 i * W + j 行代表了输出图像像素 (i, j) 计算所需的输入像素索引
     indices = windows[:, None] + offsets[None, :]  # (H * W, K * K)
 
-    # row_idx: 每个赋值操作对应的输出像素索引（T 的行号）
-    # col_idx: 每个赋值操作对应的输入像素索引（T 的列号）
-    row_idx = np.repeat(np.arange(H * W), K * K)  # (H * W * K * K,)
-    col_idx = indices.ravel()  # (H * W * K * K,)
-
     kernel_vec = kernel.ravel()  # (K * K,)
-    val = np.tile(kernel_vec, H * W)  # (H * W * K * K,)
 
-    T[row_idx, col_idx] = val
+    T[np.arange(36)[:, None], indices] = kernel_vec
 
-    y = np.dot(T, x)
+    y = T @ x
     output = y.reshape(H, W)
 
     return output
@@ -130,7 +124,7 @@ def convolve(img, kernel):
 
     T = img_vec[indices]  # (H_out * W_out, K * K)
 
-    output = np.dot(T, kernel_vec)
+    output = T @ kernel_vec
     output = output.reshape(H_out, W_out)
 
     return output
@@ -157,57 +151,6 @@ def Sobel_filter_y(img):
     return output
 
 
-# def cross_correlation_naive(img, kernel, padding=False):
-#     """
-#     使用 for 循环的相关性计算（不翻转kernel）
-
-#     Parameters:
-#     -----------
-#     img: array(float)
-#         输入图像
-#     kernel: array(float)
-#         卷积核
-#     padding: bool
-#         False - valid卷积，输出尺寸 (H-K+1, W-K+1)
-#         True - zero padding，输出尺寸与输入相同 (H, W)
-
-#     Returns:
-#     --------
-#     output: array(float)
-#         相关计算结果
-#     """
-#     H, W = img.shape
-#     K = kernel.shape[0]
-
-#     if not padding:
-#         # valid卷积：不填充，输出缩小
-#         H_out = H - K + 1
-#         W_out = W - K + 1
-#         padded_img = img.copy()
-
-#     else:
-#         # zero padding：填充0，输出尺寸不变
-#         H_out = H
-#         W_out = W
-#         pad_size = (K - 1) // 2
-#         # 创建填充后的图像
-#         padded_img = np.zeros((H + 2*pad_size, W + 2*pad_size))
-#         padded_img[pad_size:pad_size+H, pad_size:pad_size+W] = img
-
-#     # 初始化输出
-#     output = np.zeros((H_out, W_out))
-
-#     # 计算互相关
-#     for i in range(H_out):
-#         for j in range(W_out):
-#             # 提取窗口
-#             window = padded_img[i:i+K, j:j+K]
-#             # 逐元素相乘后求和
-#             output[i, j] = np.sum(window * kernel)
-
-#     return output
-
-
 if __name__ == "__main__":
 
     np.random.seed(111)
@@ -225,15 +168,9 @@ if __name__ == "__main__":
     result_1 = convol_with_Toeplitz_matrix(input_array, input_kernel)
     np.savetxt("result/HM1_Convolve_result_1.txt", result_1)
 
-    # ans_1 = cross_correlation_naive(input_array, input_kernel, padding=True)
-    # np.savetxt("result/HM1_Convolve_ans_1.txt", ans_1)
-
     # task 3: convolution with sliding-window
     result_2 = convolve(input_array, input_kernel)
     np.savetxt("result/HM1_Convolve_result_2.txt", result_2)
-
-    # ans_2 = cross_correlation_naive(input_array, input_kernel, padding=False)
-    # np.savetxt("result/HM1_Convolve_ans_2.txt", ans_2)
 
     # task 4/5: Gaussian filter and Sobel filter
     input_img = read_img("Lenna.png")/255
