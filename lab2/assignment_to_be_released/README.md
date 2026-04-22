@@ -92,10 +92,10 @@ tensorboard --logdir .
 ```bash
   results
   ├── bn_loss.txt
-  ├── Lenna.png 
-  ├── Lenna_aug1.png 
-  ├── Lenna_aug2.png 
-  ├── Screenshot_LearningRate.png 
+  ├── Lenna.png
+  ├── Lenna_aug1.png
+  ├── Lenna_aug2.png
+  ├── Screenshot_LearningRate.png
   └── Screenshot_YourBest.png
 
   ```

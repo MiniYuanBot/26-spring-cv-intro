@@ -52,21 +52,25 @@ class CIFAR10(torch.utils.data.Dataset):
 
         # ------------TODO--------------
         # data augmentation
+        data_normalized = self.data.astype(np.float32) / 255.0
+        mean = np.mean(data_normalized, axis=(0, 1, 2))
+        std = np.std(data_normalized, axis=(0, 1, 2))
+
         # training transform (position + color)
         self.train_transform = tfs.Compose([
             tfs.ToPILImage(),
             # position augmentation
             tfs.RandomHorizontalFlip(p=0.5),
             # color augmentation
-            tfs.ColorJitter(brightness=0.2, contrast=0.2, saturation=0.2),
+            tfs.ColorJitter(brightness=0.2, contrast=0.2, saturation=0.2, hue=0.1),
             tfs.ToTensor(),
-            tfs.Normalize((0.4914, 0.4822, 0.4465), (0.2470, 0.2435, 0.2616))
+            tfs.Normalize(mean, std)
         ])
 
         self.test_transform = tfs.Compose([
             tfs.ToPILImage(),
             tfs.ToTensor(),
-            tfs.Normalize((0.4914, 0.4822, 0.4465), (0.2470, 0.2435, 0.2616))
+            tfs.Normalize(mean, std)
         ])
         # ------------TODO--------------
 
