@@ -76,7 +76,7 @@ python dataset.py
 
 ```bash
 cd cifar-10
-python train.py
+python train.py -e test -l 1e-4
 cd ../experiments
 tensorboard --logdir .
 ```

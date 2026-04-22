@@ -2,19 +2,22 @@ import os
 import os.path
 import numpy as np
 import pickle
-import torch 
+import torch
 import torchvision.transforms as tfs
 from PIL import Image
+
 
 class CIFAR10(torch.utils.data.Dataset):
     """
         modified from `CIFAR10 <https://www.cs.toronto.edu/~kriz/cifar.html>`_ Dataset.
     """
+
     def __init__(self, train=True):
         super(CIFAR10, self).__init__()
 
         self.base_folder = '../datasets/cifar-10-batches-py'
-        self.train_list = ['data_batch_1', 'data_batch_2', 'data_batch_3', 'data_batch_4','data_batch_5']
+        self.train_list = ['data_batch_1', 'data_batch_2',
+                           'data_batch_3', 'data_batch_4', 'data_batch_5']
         self.test_list = ['test_batch']
 
         self.meta = {
@@ -47,6 +50,26 @@ class CIFAR10(torch.utils.data.Dataset):
 
         self._load_meta()
 
+        # ------------TODO--------------
+        # data augmentation
+        # training transform (position + color)
+        self.train_transform = tfs.Compose([
+            tfs.ToPILImage(),
+            # position augmentation
+            tfs.RandomHorizontalFlip(p=0.5),
+            # color augmentation
+            tfs.ColorJitter(brightness=0.2, contrast=0.2, saturation=0.2),
+            tfs.ToTensor(),
+            tfs.Normalize((0.4914, 0.4822, 0.4465), (0.2470, 0.2435, 0.2616))
+        ])
+
+        self.test_transform = tfs.Compose([
+            tfs.ToPILImage(),
+            tfs.ToTensor(),
+            tfs.Normalize((0.4914, 0.4822, 0.4465), (0.2470, 0.2435, 0.2616))
+        ])
+        # ------------TODO--------------
+
     def _load_meta(self):
         path = os.path.join(self.base_folder, self.meta['filename'])
         with open(path, 'rb') as infile:
@@ -63,11 +86,17 @@ class CIFAR10(torch.utils.data.Dataset):
             tuple: (image, target) where target is index of the target class.
         """
         img, target = self.data[index], self.targets[index]
-        img = img.astype(np.float32)
-        img = img.transpose(2, 0, 1)
-        
+        # img = img.astype(np.float32)
+        # img = img.transpose(2, 0, 1)
+
         # ------------TODO--------------
         # data augmentation
+        img = img.astype(np.uint8)
+
+        if self.train:
+            img = self.train_transform(img)
+        else:
+            img = self.test_transform(img)
         # ------------TODO--------------
 
         return img, target
@@ -91,7 +120,7 @@ if __name__ == '__main__':
     #     cv2.imwrite(f'aug1_{i}.png', imgs)
     #     i += 1
     #     if i == 10:
-    #         break 
+    #         break
 
     # Visualize and save for submission
     img = Image.open('Lenna.png')
@@ -99,13 +128,19 @@ if __name__ == '__main__':
 
     # --------------TODO------------------
     # Copy the first kind of your augmentation code here
+    position_aug = tfs.Compose([
+        tfs.RandomHorizontalFlip(p=1),
+    ])
     # --------------TODO------------------
-    aug1 = img
+    aug1 = position_aug(img)
     aug1.save(f'../results/Lenna_aug1.png')
 
     # --------------TODO------------------
     # Copy the second kind of your augmentation code here
+    color_aug = tfs.Compose([
+        tfs.ColorJitter(brightness=0.3, contrast=0.3, saturation=0.4, hue=0.1),
+    ])
     # --------------TODO------------------
-    aug2 = img
+    torch.manual_seed(666)
+    aug2 = color_aug(img)
     aug2.save(f'../results/Lenna_aug2.png')
-

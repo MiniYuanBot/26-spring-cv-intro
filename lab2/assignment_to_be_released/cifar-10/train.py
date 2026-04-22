@@ -2,18 +2,31 @@ import os
 import torch
 from dataset import CIFAR10
 from network import ConvNet
-import tqdm 
+import tqdm
 import torch.optim as optim
 from util import evaluate, AverageMeter
 import argparse
-from torch.utils.tensorboard  import SummaryWriter
+from torch.utils.tensorboard import SummaryWriter
 
 
 def MyCELoss(pred, gt):
     # ----------TODO------------
     # Implement CE loss here
+    # pred: (B, K)
+    # gt: (B,)
+    # B is batch_size, K is num_class
+    B, _ = pred.shape
+    EPS = 1e-8
+
+    # torch.max returns (values, indices)
+    pred_max = torch.max(pred, dim=1, keepdim=True)[0]  # (B, 1)
+    exp_pred = torch.exp(pred - pred_max)  # (B, K)
+    softmax_probs = exp_pred / torch.sum(exp_pred, dim=1, keepdim=True)  # (B, K)
+    logsoftmax_probs = torch.log(softmax_probs + EPS)  # (B, K)
+
+    loss = -torch.mean(logsoftmax_probs[range(B), gt], dim=0)
     # ----------TODO------------
-    return loss 
+    return loss
 
 
 def validate(epoch, model, val_loader, writer):
@@ -34,11 +47,14 @@ def validate(epoch, model, val_loader, writer):
 
     # ----------TODO------------
     # draw accuracy curve!
+    writer.add_scalar('val/top1', top1.avg, epoch)
+    writer.add_scalar('val/top5', top5.avg, epoch)
     # ----------TODO------------
 
     print(' Val Acc@1 {top1.avg:.3f}'.format(top1=top1))
     print(' Val Acc@5 {top5.avg:.3f}'.format(top5=top5))
-    return 
+    return
+
 
 def train(epoch, model, optimizer, criterion, train_loader, writer):
     model.train()
@@ -49,7 +65,7 @@ def train(epoch, model, optimizer, criterion, train_loader, writer):
     iteration = len(train_loader) * epoch
     for imgs, labels in tqdm.tqdm(train_loader):
         bsz = labels.shape[0]
-        
+
         if torch.cuda.is_available():
             imgs = imgs.cuda()
             labels = labels.cuda()
@@ -70,15 +86,19 @@ def train(epoch, model, optimizer, criterion, train_loader, writer):
 
         iteration += 1
         if iteration % 50 == 0:
-            pass 
+            pass
             # ----------TODO------------
             # draw loss curve and accuracy curve!
+            writer.add_scalar('train/loss', losses.avg, iteration)
+            writer.add_scalar('train/top1', top1.avg, iteration)
+            writer.add_scalar('train/top5', top5.avg, iteration)
             # ----------TODO------------
 
-    print(' Epoch: %d'%(epoch))
+    print(' Epoch: %d' % (epoch))
     print(' Train Acc@1 {top1.avg:.3f}'.format(top1=top1))
     print(' Train Acc@5 {top5.avg:.3f}'.format(top5=top5))
-    return 
+    return
+
 
 def run(args):
     save_folder = os.path.join('../experiments',  args.exp_name)
@@ -94,9 +114,9 @@ def run(args):
     train_loader = torch.utils.data.DataLoader(
         train_dataset, batch_size=args.batchsize, shuffle=True, num_workers=2)
     val_loader = torch.utils.data.DataLoader(
-         val_dataset, batch_size=args.batchsize, shuffle=False, num_workers=2)
-    
-    # define network 
+        val_dataset, batch_size=args.batchsize, shuffle=False, num_workers=2)
+
+    # define network
     model = ConvNet()
     if torch.cuda.is_available():
         model = model.cuda()
@@ -112,7 +132,7 @@ def run(args):
         ckpt_lst = os.listdir(ckpt_folder)
         ckpt_lst.sort(key=lambda x: int(x.split('_')[-1]))
         read_path = os.path.join(ckpt_folder, ckpt_lst[-1])
-        print('load checkpoint from %s'%(read_path))
+        print('load checkpoint from %s' % (read_path))
         checkpoint = torch.load(read_path)
         model.load_state_dict(checkpoint['model'])
         optimizer.load_state_dict(checkpoint['optimizer'])
@@ -122,28 +142,35 @@ def run(args):
 
     for epoch in range(start_epoch, args.total_epoch):
         train(epoch, model, optimizer, criterion, train_loader, writer)
-        
+
         if epoch % args.save_freq == 0:
             state = {
                 'model': model.state_dict(),
                 'optimizer': optimizer.state_dict(),
                 'epoch': epoch,
             }
-            save_file = os.path.join(ckpt_folder, 'ckpt_epoch_%s'%(str(epoch)))
+            save_file = os.path.join(ckpt_folder, 'ckpt_epoch_%s' % (str(epoch)))
             torch.save(state, save_file)
 
         with torch.no_grad():
             validate(epoch, model, val_loader, writer)
-    return 
+    return
+
 
 if __name__ == '__main__':
     arg_parser = argparse.ArgumentParser()
-    arg_parser.add_argument('--exp_name', '-e', type=str, required=True, help="The checkpoints and logs will be save in ./checkpoint/$EXP_NAME")
-    arg_parser.add_argument('--lr', '-l', type=float, default=1e-4, help="Learning rate")
-    arg_parser.add_argument('--save_freq', '-s', type=int, default=1, help="frequency of saving model")
-    arg_parser.add_argument('--total_epoch', '-t', type=int, default=10, help="total epoch number for training")
-    arg_parser.add_argument('--cont', '-c', action='store_true', help="whether to load saved checkpoints from $EXP_NAME and continue training")
-    arg_parser.add_argument('--batchsize', '-b', type=int, default=20, help="batch size")
+    arg_parser.add_argument('--exp_name', '-e', type=str, required=True,
+                            help="The checkpoints and logs will be save in ./checkpoint/$EXP_NAME")
+    arg_parser.add_argument('--lr', '-l', type=float,
+                            default=1e-4, help="Learning rate")
+    arg_parser.add_argument('--save_freq', '-s', type=int,
+                            default=1, help="frequency of saving model")
+    arg_parser.add_argument('--total_epoch', '-t', type=int,
+                            default=10, help="total epoch number for training")
+    arg_parser.add_argument('--cont', '-c', action='store_true',
+                            help="whether to load saved checkpoints from $EXP_NAME and continue training")
+    arg_parser.add_argument('--batchsize', '-b', type=int,
+                            default=20, help="batch size")
     args = arg_parser.parse_args()
 
     run(args)
