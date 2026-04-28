@@ -1,27 +1,36 @@
 \section{Object Detection}
-
 \subsection{Basics}
-
 \subsubsection*{Task Definition}
+Output axis-aligned bbox $(x,y,h,w)$ plus class confidence score. Backbone CNN extracts feature map.
 
 \subsubsection*{Regression Losses}
+L1: $\ell=\sum|\Delta_i|$ (robust, constant gradient). L2: $\ell=\sum\Delta_i^2$ (sensitive to outliers).
+Smooth L1 (Huber): $\text{smooth}_{L1}(x)=0.5x^2$ if $|x|<1$, else $|x|-0.5$. Best of both.
 
 \subsection{Two-Stage Detectors}
-
 \subsubsection*{R-CNN to Fast R-CNN}
+R-CNN: selective search proposals, each cropped and fed to CNN independently. Slow, not end-to-end, loses context.
+Fast R-CNN: CNN first on whole image, then crop feature map (RoI Pool). Faster but still uses selective search.
 
 \subsubsection*{Faster R-CNN}
+RPN replaces selective search on shared feature map. Pipeline: Backbone $\to$ RPN proposals $\to$ RoI Pool/Align $\to$ cls + reg heads.
 
 \subsubsection*{RoI Generation}
+RPN outputs proposals with objectness scores. Post-process: NMS ($\tau=0.7$), top-K, positive/negative sampling by IoU thresholds (pos $>0.7$, neg $<0.3$, ignore middle).
+RPN anchor regression targets: $t_x=\frac{x_g-x_a}{w_a}$, $t_y=\frac{y_g-y_a}{h_a}$, $t_w=\log\frac{w_g}{w_a}$, $t_h=\log\frac{h_g}{h_a}$.
+RPN loss: $L=L_{\text{cls}}+\lambda L_{\text{reg}}$ with BCE for cls and Smooth L1 for reg (positive only).
 
 \subsection{Single-Stage Detectors}
-
 \subsubsection*{Core Mechanism}
+YOLO/SSD: dense prediction on feature map grid $H\times W$ with $B$ anchors per cell. Output $H\times W\times(5B+K)$. Direct cls + reg without proposals.
 
 \subsubsection*{Training Design}
+Category-specific (vs RPN's foreground/background). Faster inference, slightly lower accuracy historically.
 
 \subsection{Post-processing and Evaluation}
-
 \subsubsection*{Non-Maximum Suppression}
+NMS: sort by score; greedily keep highest, remove IoU$>\tau$. Soft-NMS: decay scores by overlap instead of hard removal. Class-wise NMS: run per category.
 
 \subsubsection*{Detection Metrics}
+TP: correct class + IoU$\ge\tau$ + unmatched GT. FP: wrong class or IoU$<\tau$ or duplicate match. FN: unmatched GT.
+AP: area under PR curve (11-point interpolation). mAP: mean over classes and/or IoU thresholds.

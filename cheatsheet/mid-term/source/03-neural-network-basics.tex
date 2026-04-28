@@ -1,25 +1,44 @@
-\section{Neural Network Basics}
-
+\section{ML and Neural Network Basics}
 \subsection{Problem Setup}
-
 \subsubsection*{Task Formulation}
+Given input $x\in\mathbb{R}^d$, predict label $y$. Soft output: $p(y=1|x)\in[0,1]$; hard: $p(y=1|x)\ge\tau$.
+Model: $h(x;\theta)$ with parameters $\theta$.
 
 \subsubsection*{Data Pipeline}
+Split: train (learn, update params), validation (tune hyperparams), test (final eval), inference (deploy).
+Preprocessing: normalize (zero-mean/unit-var or $[0,1]$); augment (crop, flip, rotate); batch and shuffle.
 
 \subsection{Models}
-
 \subsubsection*{Logistic Regression}
+Linear score $z=\theta^Tx+b$. Sigmoid: $\sigma(z)=\frac{1}{1+e^{-z}}$.
+Parameters: $\theta\in\mathbb{R}^d$, $b\in\mathbb{R}$.
 
 \subsubsection*{MLP}
+Layer: $\mathbf{z}^{(\ell)}=\mathbf{W}^{(\ell)}\mathbf{a}^{(\ell-1)}+\mathbf{b}^{(\ell)}$, $\mathbf{a}^{(\ell)}=g_\ell(\mathbf{z}^{(\ell)})$.
+Activations: ReLU $\max(0,x)$ (default); LeakyReLU $\max(\alpha x,x)$; Sigmoid $\frac{1}{1+e^{-x}}$; tanh.
+MLP $\supseteq$ CNN in expressive power; CNN adds inductive bias for vision.
 
 \subsection{Optimization}
-
 \subsubsection*{Loss Functions}
+Binary cross-entropy (NLL): $\mathcal{L}=-\frac{1}{n}\sum_{i=1}^n[y^{(i)}\log h^{(i)}+(1-y^{(i)})\log(1-h^{(i)})]$.
+With L2 regularization: $\mathcal{L}_{\text{reg}}=\mathcal{L}+\frac{\lambda}{2}\|\theta\|^2$.
+Multi-class: Softmax + cross-entropy. KL divergence: $D_{KL}(P\|Q)=H(P,Q)-H(P)$.
 
 \subsubsection*{Backpropagation}
+Output layer (sigmoid + BCE): $\boldsymbol{\delta}^{(L)}=\mathbf{a}^{(L)}-\mathbf{y}$.
+Hidden layers: $\boldsymbol{\delta}^{(\ell)}=((\mathbf{W}^{(\ell+1)})^T\boldsymbol{\delta}^{(\ell+1)})\odot g_\ell'(\mathbf{z}^{(\ell)})$.
+Gradients: $\frac{\partial\mathcal{L}}{\partial\mathbf{W}^{(\ell)}}=\boldsymbol{\delta}^{(\ell)}(\mathbf{a}^{(\ell-1)})^T$, $\frac{\partial\mathcal{L}}{\partial\mathbf{b}^{(\ell)}}=\boldsymbol{\delta}^{(\ell)}$.
 
 \subsubsection*{Optimizers}
+SGD: $\theta_{t+1}=\theta_t-\alpha g_t$.
+Momentum: $v_t=\rho v_{t-1}+(1-\rho)g_t$, $\theta_{t+1}=\theta_t-\alpha v_t$.
+RMSProp: $s_t=\rho s_{t-1}+(1-\rho)g_t^2$, $\theta_{t+1}=\theta_t-\alpha\frac{g_t}{\sqrt{s_t}+\epsilon}$.
+Adam: $m_t=\beta_1m_{t-1}+(1-\beta_1)g_t$, $v_t=\beta_2v_{t-1}+(1-\beta_2)g_t^2$; bias-correct $\hat m_t,\hat v_t$; update with $\alpha\frac{\hat m_t}{\sqrt{\hat v_t}+\epsilon}$.
 
 \subsubsection*{Learning Rate}
+Strategies: fixed; step decay; exponential $\alpha_t=\alpha_0\gamma^t$; linear; cosine $\alpha_t=\frac{1}{2}\alpha_0(1+\cos(t\pi/T))$; warmup; ReduceLROnPlateau.
+Tip: Adam + fixed decay to find convergence epoch, then SGD + Momentum + cosine.
 
 \subsection{Evaluation Metrics}
+Accuracy$=\frac{TP+TN}{TOT}$; Precision$=\frac{TP}{TP+FP}$; Recall$=\frac{TP}{TP+FN}$; F1$=2\frac{P\cdot R}{P+R}$.
+Generalization gap: $\mathbb{E}_{\text{test}}[\text{loss}]-\mathbb{E}_{\text{train}}[\text{loss}]$.

@@ -1,25 +1,41 @@
 \section{Classical Feature Extraction}
-
 \subsection{Line Fitting}
-
 \subsubsection*{Least Squares}
+Fit $y=kx+m$ by minimizing $\sum_{i=1}^n(y_i-(kx_i+m))^2$.
+Matrix form: $\min_{\boldsymbol{\theta}}\|A\boldsymbol{\theta}-\boldsymbol{y}\|_2^2$ with $A=[x_i,1]$, $\boldsymbol{\theta}=[k,m]^T$.
+Solution: $\boldsymbol{\theta}=(A^TA)^{-1}A^T\boldsymbol{y}$. Unstable for near-vertical lines.
 
 \subsubsection*{SVD Fitting}
+Improved: $\min_{a,b,d}\sum(ax_i+by_i-d)^2$ s.t. $a^2+b^2+d^2=1$.
+Matrix form: $\min_{\boldsymbol{h}}\|A\boldsymbol{h}\|^2$ with $A=[x_i,y_i,1]$, $\|\boldsymbol{h}\|=1$.
+SVD: $A=UDV^T$. Solution: $\boldsymbol{h}=\pm\boldsymbol{v}_3$ (right singular vector for smallest singular value).
 
 \subsubsection*{RANSAC}
+Robust to outliers via random sampling. Steps: (1) choose $s$, $\delta$, $p$; (2) sample $s$ points; (3) fit model; (4) count inliers; (5) update best; (6) repeat $N$ times; (7) refit on best inliers.
+Required iterations: $N=\frac{\log(1-p)}{\log(1-(1-e)^s)}$ where $e$ is outlier ratio.
 
 \subsection{Corner Detection}
-
 \subsubsection*{Harris Response}
+Energy after shift $(u,v)$: $E(u,v)\approx[u\;v]M[x_0,y_0][u\;v]^T$.
+Structure tensor: $M=\sum_{(x,y)\in N}\begin{bmatrix}I_x^2&I_xI_y\\I_xI_y&I_y^2\end{bmatrix}$, often with Gaussian weighting.
+Corner response: $\theta=\det M-\alpha(\operatorname{tr}M)^2=(I_x^2I_y^2-(I_xI_y)^2)-\alpha(I_x^2+I_y^2)^2$.
+$\theta\gg0$: corner; $\theta\ll0$: edge; $\theta\approx0$: flat.
 
 \subsubsection*{Harris Pipeline}
+Steps: (1) compute gradients $I_x,I_y$; (2) compute $I_x^2,I_y^2,I_xI_y$; (3) Gaussian smooth the three maps; (4) compute $\theta$ and threshold; (5) NMS to keep local maxima.
 
 \subsubsection*{Geometric Properties}
+Translation equivariant: $T_{u,v}(\Theta(A))=\Theta(T_{u,v}(A))$.
+Rotation equivariant with isotropic filter: $R_\phi(\Theta(A))=\Theta(R_\phi(A))$.
+Scale non-equivariant: viewpoint changes break detection.
 
 \subsection{Classical Recognition Pipeline}
-
 \subsubsection*{Feature Detection}
+Keypoint detector (Harris, DoG) + descriptor (SIFT). SIFT: 128-dim vector from $4\times4$ spatial grids with 8 orientation bins each, after orientation normalization.
 
 \subsubsection*{Bag-of-Visual-Words}
+Steps: (1) collect descriptors; (2) k-means cluster into $K$ visual words; (3) assign each descriptor to nearest word (hard/soft); (4) build $K$-dim frequency histogram.
+Loses spatial information; cannot distinguish ``nose above eyes'' from ``eyes above nose''.
 
 \subsubsection*{Limits of Classical CV}
+Manual feature design; error accumulation across stages; weak high-level semantics; poor scaling with data; limited generalization.

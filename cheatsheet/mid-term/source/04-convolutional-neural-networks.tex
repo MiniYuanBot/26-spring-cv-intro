@@ -1,29 +1,49 @@
 \section{Convolutional Neural Networks}
-
 \subsection{CNN Core Mechanisms}
-
 \subsubsection*{Conv Layer}
+Input $W_{in}\times H_{in}\times C$; kernel $F\times F\times C$; $K$ filters; stride $S$; padding $P$.
+$W_{out}=\lfloor\frac{W_{in}-F+2P}{S}\rfloor+1$; params $=(F^2C+1)K$.
 
 \subsubsection*{Padding and Stride}
+Valid: $P=0$. Same: $P=\lfloor\frac{F-1}{2}\rfloor$. Full: $P=F-1$.
+Content: zero, constant, reflect, replicate, circular.
 
 \subsubsection*{Pooling}
+Types: max (most common), average, sum. No trainable params.
+Increases invariance to small translation/rotation.
 
 \subsubsection*{CNN vs FC}
+Params: Conv $(F^2C+1)K$ vs FC $(W_{in}H_{in}C+1)(W_{out}H_{out}K)$.
+Sparse connectivity + parameter sharing give translation equivariance and location preservation.
 
 \subsection{CNN Training Practice}
-
 \subsubsection*{Data Preprocessing}
+Normalize: per-channel zero-mean/unit-var or scale to $[0,1]$. Augment: random crop, flip, rotate, color jitter. Shuffle and batch.
 
 \subsubsection*{Weight Initialization}
+Preserve variance: $\sigma_w^2=\frac{1}{\text{fan}_{in}}$.
+Xavier/Glorot (tanh/sigmoid): $\sigma_w^2=\frac{1}{\text{fan}_{in}}$ or $\frac{2}{\text{fan}_{in}+\text{fan}_{out}}$.
+He (ReLU): $\sigma_w^2=\frac{2}{\text{fan}_{in}}$.
+Uniform: $W\sim\mathcal{U}(-\sqrt{3\sigma_w^2},\sqrt{3\sigma_w^2})$.
 
 \subsubsection*{Batch Training}
+Iteration: one forward+backward on a batch. Epoch: full pass over training set.
+BatchNorm (CNN): $\mu_{B,c}=\frac{1}{m}\sum x$, $\sigma^2_{B,c}=\frac{1}{m}\sum(x-\mu)^2$; $\hat x=\frac{x-\mu}{\sqrt{\sigma^2+\epsilon}}$; $y=\gamma\hat x+\beta$. Running stats for eval.
 
 \subsection{Classification Backbones}
-
 \subsubsection*{Receptive Field}
+Jump: $j_\ell=\prod_{i=1}^{\ell-1}s_i$, $j_1=1$.
+Receptive field: $f_\ell=f_{\ell-1}+(k_{\ell-1}-1)j_{\ell-1}$, $f_1=1$.
+Need $k_\ell\ge s_\ell$ to avoid gaps.
 
 \subsubsection*{VGG}
+Smaller kernels ($3\times3$), deeper nets. Three $3\times3$ layers = one $7\times7$ RF, but more nonlinearities and fewer params ($27C^2$ vs $49C^2$).
 
 \subsubsection*{ResNet}
+Residual block: learn $F(x)=H(x)-x$; output $y=F(x)+x$.
+Basic block: two $3\times3$ convs. Bottleneck: $1\times1$ (reduce), $3\times3$ (spatial), $1\times1$ (restore). Bottleneck params $\ll$ Basic block.
 
 \subsubsection*{Beyond ResNet}
+SENet: channel attention. DenseNet: dense connections (concat all previous).
+MobileNet: depthwise separable conv. Depthwise (per-channel spatial) + pointwise ($1\times1$ channel mix). Cost $\approx$ standard/$N$.
+NAS: neural architecture search.

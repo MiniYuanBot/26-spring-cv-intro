@@ -1,21 +1,37 @@
 \section{Edge Detection}
-
 \subsection{Conceptions}
+\subsubsection*{Image as Discrete Function}
+Image $I(x,y)$ is a 2D discrete function with intensity values. Edge detection operates on this function via differential or filter-based operators.
 
 \subsubsection*{LTI Systems}
+Linear time-invariant system satisfies: linearity $a x(t)\to a y(t)$, $x_1+x_2\to y_1+y_2$; shift-invariance $x(t-\tau)\to y(t-\tau)$.
 
 \subsubsection*{Convolution vs Cross-Correlation}
+2D convolution (filtering): $(f*g)[m,n]=\sum_k\sum_\ell f[k,\ell]g[m-k,n-\ell]$.
+2D cross-correlation (template matching): $(f\star g)[i,j]=\sum_m\sum_n f[i+m,j+n]g[m,n]$.
+Convolution flips kernel; cross-correlation does not. Convolution satisfies commutativity/associativity; cross-correlation does not.
 
 \subsection{Frequency Domain}
-
 \subsubsection*{Fourier Transform}
+Discrete: $\mathcal{F}\{f\}(\omega)=\sum_n f[n]e^{-i2\pi\omega n}$. Continuous: $\mathcal{F}\{f\}(\omega)=\int f(t)e^{-i2\pi\omega t}dt$.
+Convolution theorem: $\mathcal{F}\{f*g\}=\mathcal{F}\{f\}\cdot\mathcal{F}\{g\}$.
 
 \subsubsection*{Gaussian Filtering}
+1D spatial: $g(x)=\frac{1}{\sqrt{2\pi}\sigma}\exp(-\frac{x^2}{2\sigma^2})$. Frequency: $\mathcal{F}\{g\}(\omega)=\exp(-\frac{\sigma^2\omega^2}{2})$.
+2D spatial: $g(x,y)=\frac{1}{2\pi\sigma^2}\exp(-\frac{x^2+y^2}{2\sigma^2})$. Larger $\sigma$ selects more low-frequency components.
 
 \subsection{Edge Detection}
-
 \subsubsection*{Edge Gradients}
+Gradient vector: $\nabla f=(\frac{\partial f}{\partial x},\frac{\partial f}{\partial y})$.
+Magnitude: $|\nabla f|=\sqrt{(\frac{\partial f}{\partial x})^2+(\frac{\partial f}{\partial y})^2}$.
+Orientation: $\theta=\operatorname{atan2}(\frac{\partial f}{\partial y},\frac{\partial f}{\partial x})$.
 
 \subsubsection*{Finite Difference and Derivative Theorem}
+Central difference: $\frac{\partial f}{\partial x}\approx\frac{f(m+1,n)-f(m-1,n)}{2}$.
+Derivative theorem of convolution: $\frac{\partial}{\partial x}(f*g)=f*\frac{\partial g}{\partial x}$.
+Efficient edge detection: $G_x=f*\frac{\partial g}{\partial x}$, $G_y=f*\frac{\partial g}{\partial y}$; $|\nabla f|=\sqrt{G_x^2+G_y^2}$.
 
 \subsubsection*{Canny Detector}
+Canny pipeline: (1) Gaussian derivative filtering for $G_x,G_y$; (2) compute magnitude and orientation; (3) NMS for single-pixel edges; (4) hysteresis thresholding with edge linking.
+NMS: for pixel $q$, compare $M(q)$ with interpolated $M(q_1),M(q_2)$ along gradient direction; keep if largest.
+Hysteresis: $maxVal=0.3\times avg$, $minVal=0.1\times avg$. Strong ($M\ge maxVal$): keep. Weak ($minVal\le M<maxVal$): keep if connected to strong. Weak suppressed otherwise.
