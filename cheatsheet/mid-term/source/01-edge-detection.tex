@@ -1,14 +1,14 @@
 \section{Edge Detection}
 \subsection{Conceptions}
 \subsubsection*{Image as Discrete Function}
-Image $I(x,y)$ is a 2D discrete function with intensity values. Edge detection operates on this function via differential or filter-based operators.
+Image $I(x,y)$ is a 2D discrete function with \textbf{intensity} values.
 
 \subsubsection*{LTI Systems}
 Linear time-invariant system satisfies: linearity $a x(t)\to a y(t)$, $x_1+x_2\to y_1+y_2$; shift-invariance $x(t-\tau)\to y(t-\tau)$.
 
 \subsubsection*{Convolution vs Cross-Correlation}
-2D convolution (filtering): $(f*g)[m,n]=\sum_k\sum_\ell f[k,\ell]g[m-k,n-\ell]$.
-2D cross-correlation (template matching): $(f\star g)[i,j]=\sum_m\sum_n f[i+m,j+n]g[m,n]$.
+2D convolution: $(f*g)[m,n]=\sum_k\sum_\ell f[k,\ell]g[m-k,n-\ell]$. \newline
+2D cross-correlation: $(f\star g)[i,j]=\sum_m\sum_n f[i+m,j+n]g[m,n]$. \newline
 Convolution flips kernel; cross-correlation does not. Convolution satisfies commutativity/associativity; cross-correlation does not.
 
 \subsection{Frequency Domain}
@@ -18,7 +18,7 @@ Convolution theorem: $\mathcal{F}\{f*g\}=\mathcal{F}\{f\}\cdot\mathcal{F}\{g\}$.
 
 \subsubsection*{Gaussian Filtering}
 1D spatial: $g(x)=\frac{1}{\sqrt{2\pi}\sigma}\exp(-\frac{x^2}{2\sigma^2})$. Frequency: $\mathcal{F}\{g\}(\omega)=\exp(-\frac{\sigma^2\omega^2}{2})$.
-2D spatial: $g(x,y)=\frac{1}{2\pi\sigma^2}\exp(-\frac{x^2+y^2}{2\sigma^2})$. Larger $\sigma$ selects more low-frequency components.
+2D spatial: $g(x,y)=\frac{1}{2\pi\sigma^2}\exp(-\frac{x^2+y^2}{2\sigma^2})$. Larger $\sigma$ selects more \textbf{low-frequency} components.
 
 \subsection{Edge Detection}
 \subsubsection*{Edge Gradients}
@@ -33,5 +33,7 @@ Efficient edge detection: $G_x=f*\frac{\partial g}{\partial x}$, $G_y=f*\frac{\p
 
 \subsubsection*{Canny Detector}
 Canny pipeline: (1) Gaussian derivative filtering for $G_x,G_y$; (2) compute magnitude and orientation; (3) NMS for single-pixel edges; (4) hysteresis thresholding with edge linking.
-NMS: for pixel $q$, compare $M(q)$ with interpolated $M(q_1),M(q_2)$ along gradient direction; keep if largest.
+
+\subsubsection*{NMS}
+for pixel $q$, compare $M(q)$ with interpolated $M(q_1),M(q_2)$ along gradient direction; keep if largest.
 Hysteresis: $maxVal=0.3\times avg$, $minVal=0.1\times avg$. Strong ($M\ge maxVal$): keep. Weak ($minVal\le M<maxVal$): keep if connected to strong. Weak suppressed otherwise.

@@ -1,8 +1,8 @@
 INFO:  ANSI Code Page: 65001
 INFO:  latexindent.exe version 3.24.4, 2024-07-18, a script to indent .tex files
        latexindent.exe lives here: D:/texlive/2025/bin/windows/
-       Tue Apr 28 21:17:54 2026
-       Filename: d:/__Coding__/github/26-spring-cv-intro/cheatsheet/mid-term/source/__latexindent_temp_04-deep-learning-1.tex
+       Wed Apr 29 02:15:47 2026
+       Filename: d:/__Coding__/github/26-spring-cv-intro/cheatsheet/mid-term/source/__latexindent_temp_02-classical-feature-extraction.tex
 INFO:  Processing switches:
        -y|--yaml: YAML settings specified via command line
        -c|--cruft: cruft directory
@@ -17,9 +17,9 @@ INFO:  YAML reading settings
        latexindent.pl didn't find indentconfig.yaml or .indentconfig.yaml
        see all possible locations: https://latexindentpl.readthedocs.io/en/latest/sec-appendices.html#indentconfig-options)
 INFO:  YAML settings read: -y switch
-       YAML setting: defaultIndent:'  '
-       single-quoted string found in -y switch: '  ', substitute to   
-       Updating mainSettings with defaultIndent:   
+       YAML setting: defaultIndent:'    '
+       single-quoted string found in -y switch: '    ', substitute to     
+       Updating mainSettings with defaultIndent:     
 INFO:  Phase 1: searching for objects
 INFO:  Phase 2: finding surrounding indentation
 INFO:  Phase 3: indenting objects

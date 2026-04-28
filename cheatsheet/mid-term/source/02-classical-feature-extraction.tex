@@ -16,18 +16,21 @@ Required iterations: $N=\frac{\log(1-p)}{\log(1-(1-e)^s)}$ where $e$ is outlier 
 
 \subsection{Corner Detection}
 \subsubsection*{Harris Response}
-Energy after shift $(u,v)$: $E(u,v)\approx[u\;v]M[x_0,y_0][u\;v]^T$.
-Structure tensor: $M=\sum_{(x,y)\in N}\begin{bmatrix}I_x^2&I_xI_y\\I_xI_y&I_y^2\end{bmatrix}$, often with Gaussian weighting.
+Energy after shift $(u,v)$: $E(u,v)\approx[u,v]M[x_0,y_0]$
+$[u,v]^T$.
+Structure tensor: $M=\sum_{(x,y)\in N}$
+$\begin{bmatrix}I_x^2&I_xI_y\\I_xI_y&I_y^2\end{bmatrix}$, often with Gaussian weighting.
 Corner response: $\theta=\det M-\alpha(\operatorname{tr}M)^2=(I_x^2I_y^2-(I_xI_y)^2)-\alpha(I_x^2+I_y^2)^2$.
 $\theta\gg0$: corner; $\theta\ll0$: edge; $\theta\approx0$: flat.
 
 \subsubsection*{Harris Pipeline}
-Steps: (1) compute gradients $I_x,I_y$; (2) compute $I_x^2,I_y^2,I_xI_y$; (3) Gaussian smooth the three maps; (4) compute $\theta$ and threshold; (5) NMS to keep local maxima.
+Steps: (1) compute gradients $I_x,I_y$; (2) compute $I_x^2,I_y^2,I_xI_y$; (3) Gaussian smooth the three maps; (4) compute $\theta$, threshold it; (5) NMS to keep local maxima.
 
 \subsubsection*{Geometric Properties}
+\textbf{Harris} has the following properties:
 Translation equivariant: $T_{u,v}(\Theta(A))=\Theta(T_{u,v}(A))$.
-Rotation equivariant with isotropic filter: $R_\phi(\Theta(A))=\Theta(R_\phi(A))$.
-Scale non-equivariant: viewpoint changes break detection.
+Rotation equiv with \textbf{isotropic} filter: $R_\phi(\Theta(A))=\Theta(R_\phi(A))$.
+Scale non-equiv: viewpoint changes break detection.
 
 \subsection{Classical Recognition Pipeline}
 \subsubsection*{Feature Detection}
@@ -35,7 +38,7 @@ Keypoint detector (Harris, DoG) + descriptor (SIFT). SIFT: 128-dim vector from $
 
 \subsubsection*{Bag-of-Visual-Words}
 Steps: (1) collect descriptors; (2) k-means cluster into $K$ visual words; (3) assign each descriptor to nearest word (hard/soft); (4) build $K$-dim frequency histogram.
-Loses spatial information; cannot distinguish ``nose above eyes'' from ``eyes above nose''.
+Loses spatial information.
 
 \subsubsection*{Limits of Classical CV}
 Manual feature design; error accumulation across stages; weak high-level semantics; poor scaling with data; limited generalization.

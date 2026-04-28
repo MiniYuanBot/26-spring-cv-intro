@@ -16,11 +16,12 @@ Parameters: $\theta\in\mathbb{R}^d$, $b\in\mathbb{R}$.
 \subsubsection*{MLP}
 Layer: $\mathbf{z}^{(\ell)}=\mathbf{W}^{(\ell)}\mathbf{a}^{(\ell-1)}+\mathbf{b}^{(\ell)}$, $\mathbf{a}^{(\ell)}=g_\ell(\mathbf{z}^{(\ell)})$.
 Activations: ReLU $\max(0,x)$ (default); LeakyReLU $\max(\alpha x,x)$; Sigmoid $\frac{1}{1+e^{-x}}$; tanh.
-MLP $\supseteq$ CNN in expressive power; CNN adds inductive bias for vision.
+MLP $\supseteq$ CNN in expressive power; CNN adds \textbf{inductive bias} for vision.
 
 \subsection{Optimization}
 \subsubsection*{Loss Functions}
-Binary cross-entropy (NLL): $\mathcal{L}=-\frac{1}{n}\sum_{i=1}^n[y^{(i)}\log h^{(i)}+(1-y^{(i)})\log(1-h^{(i)})]$.
+Binary cross-entropy (NLL): \newline
+$\mathcal{L}=-\frac{1}{n}\sum_{i=1}^n[y^{(i)}\log h^{(i)}+(1-y^{(i)})\log(1-h^{(i)})]$.
 With L2 regularization: $\mathcal{L}_{\text{reg}}=\mathcal{L}+\frac{\lambda}{2}\|\theta\|^2$.
 Multi-class: Softmax + cross-entropy. KL divergence: $D_{KL}(P\|Q)=H(P,Q)-H(P)$.
 
