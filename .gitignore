@@ -3,3 +3,9 @@ pack.py
 
 # datasets
 /lab2/assignment_to_be_released/datasets/
+
+
+
+\centering
+\includegraphics[width=\linewidth]{assets/02-edge-01-bilinear-interpolation.jpg}
+\captionof{figure}{图1：双线性插值}

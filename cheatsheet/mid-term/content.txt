@@ -1,0 +1,15 @@
+**P1 C1 (Ch1 Edge, ~25%)**：2D卷积/互相关；高斯核；|∇f|, atan2；∂(f∗g)=f∗∂g；Canny：梯度→NMS→Hysteresis
+
+**P1 C2 (Ch2 Feature, ~22%)**：LS θ=(AᵀA)⁻¹Aᵀy；SVD h=±v₃；RANSAC迭代公式；Harris detM−α·tr²M；SIFT 128-dim；BoVW三步
+
+**P1 C3 (Ch3 ML, ~28%)**：数据划分 Train/Val/Test/Inference；Logistic Sigmoid+CE+梯度；MLP前向；激活函数表；BP三式；Adam；LR策略；Acc/Pre/Rec/F1
+
+**P1 C4 (Ch4.1–4.2 CNN, ~25%)**：输出尺寸 ⌊(W+2P−K)/S⌋+1；参数量 K·F²·C+1；Padding Valid/Same/Full；Pooling无参；Xavier σ²=1/fan_in；He σ²=2/fan_in；BN作用；Iter/Epoch
+
+**P2 C5 (Ch4.3 Backbones, ~22%)**：感受野 jₗ,fₗ；VGG 3×3³ vs 7×7；ResNet Basic 1.18M vs Bottleneck 70K；MobileNet Depthwise+Pointwise计算量
+
+**P2 C6 (Ch5 Seg, ~25%)**：转置卷积输出尺寸；UNet Skip=Concat；IoU/mIoU；Soft IoU Loss连续化公式
+
+**P2 C7 (Ch6 Det, ~28%)**：Smooth L1/Huber；Faster R-CNN Backbone→RPN→RoI→Heads；RPN cls/reg双头；RoI NMS→Top-K→采样；YOLO网格输出；NMS步骤；AP/mAP
+
+**P2 C8 (Ch7 InstSeg, ~15%)**：RoIAlign双线性插值；Mask Head Sigmoid独立预测；Class-specific K通道；逐像素Binary CE

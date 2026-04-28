@@ -1,0 +1,94 @@
+\makeatletter
+% Global list spacing: eliminate vertical gaps in itemize/enumerate
+\def\@listI{%
+    \leftmargin\leftmargini
+    \parsep 0pt
+    \topsep 0pt
+    \itemsep 0pt plus 0.1pt
+}
+\let\@listii\@listI
+\let\@listiii\@listI
+
+% 1. Body text: 7pt font, 7.5pt leading
+\renewcommand\normalsize{%
+    \@setfontsize\normalsize{7pt}{7.5pt}%
+    \abovedisplayskip 2\p@ \@plus1\p@ \@minus1\p@
+    \belowdisplayskip \abovedisplayskip
+    \abovedisplayshortskip \z@ \@plus1\p@
+    \belowdisplayshortskip 1\p@ \@plus1\p@ \@minus1\p@
+    \let\@listi\@listI
+    \zihao{6}} % CJK size 6 (~7.5pt), paired with Latin body size
+\normalsize
+
+% 2. Math size declarations: {text}{display}{script}{scriptscript}
+%    First argument must match the body font size (7pt)
+\DeclareMathSizes{7}{7}{5}{4}
+
+% 3. Small text: 6.5pt font, 7pt leading
+\renewcommand\small{%
+    \@setfontsize\small{6.5pt}{7pt}%
+    \abovedisplayskip 1.5\p@ \@plus1\p@ \@minus1\p@
+    \belowdisplayskip \abovedisplayskip
+    \abovedisplayshortskip \z@ \@plus1\p@
+    \belowdisplayshortskip 0.5\p@ \@plus1\p@ \@minus1\p@
+    \let\@listi\@listI
+    \zihao{6}}
+
+% 4. Section headings — use \def to preserve *-version handling via \@startsection
+\def\section{%
+    \@startsection{section}{1}{0mm}
+    {.2ex plus .1ex minus .05ex}
+    {.1ex plus .05ex}
+    {\color{myblue}\sffamily\fontsize{7.5pt}{8pt}\selectfont\bfseries\zihao{6}}}
+\def\subsection{%
+    \@startsection{subsection}{2}{0mm}
+    {.1ex plus .05ex minus .02ex}
+    {.05ex plus .02ex}
+    {\sffamily\bfseries\fontsize{7pt}{7.5pt}\selectfont\zihao{6}}}
+\def\subsubsection{%
+    \@startsection{subsubsection}{3}{0mm}
+    {.05ex plus .02ex minus .01ex}
+    {.01ex plus .01ex}
+    {\sffamily\fontsize{6.5pt}{7pt}\selectfont\zihao{6}}}
+\makeatother
+
+% ========== Color Definitions ==========
+\definecolor{myblue}{cmyk}{1,.72,0,.38}
+\definecolor{headergray}{RGB}{100,100,100}
+
+% ========== Math Styling ==========
+\everymath\expandafter{\the\everymath \color{myblue}}
+\everydisplay\expandafter{\the\everydisplay \color{myblue}}
+
+% ========== Page Layout ==========
+% Do NOT use \baselinestretch here; it stacks with \@setfontsize and breaks spacing.
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0.5pt plus 0.5pt minus 0.5pt}
+
+% ========== Custom Commands ==========
+% \tightlist
+\providecommand{\tightlist}{%
+    \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+
+% Highlighted formula box
+\newcommand{\formelbox}[1]{%
+    \begin{center}
+        \fbox{\parbox{0.9\columnwidth}{%
+                \centering
+                \color{myblue}
+                \fontsize{7pt}{7.5pt}\selectfont
+                $#1$
+            }}
+    \end{center}
+    \vspace{0.2mm}
+}
+
+% Compact list environment (itemize is already compressed globally via \@listI)
+\newenvironment{compactlist}
+{\begin{list}{\textbullet}{%
+            \setlength{\leftmargin}{0.5em}%
+            \setlength{\itemsep}{0pt}%
+            \setlength{\parsep}{0pt}%
+            \setlength{\topsep}{0pt}%
+            \setlength{\partopsep}{0pt}}}
+        {\end{list}}

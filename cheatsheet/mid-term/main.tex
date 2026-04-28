@@ -1,0 +1,39 @@
+\documentclass[10pt,landscape,a4paper]{article}
+
+% ========== packages ==========
+\usepackage{ctex}
+\usepackage{amsmath,amssymb}
+\usepackage{tikz}
+\usetikzlibrary{shapes,positioning,arrows,fit,calc,graphs,graphs.standard}
+\usepackage{multicol}
+\usepackage{wrapfig}
+\usepackage[top=5mm,bottom=5mm,left=5mm,right=5mm]{geometry}
+\usepackage[framemethod=tikz]{mdframed}
+\usepackage{microtype}
+\usepackage{graphicx}
+\usepackage{caption}
+
+% ========== Load Macros ==========
+\input{./def}
+
+% ========== Document Start ==========
+\begin{document}
+\small
+\pagestyle{empty}
+
+% Use multicolumn environment
+\begin{multicols*}{4}
+
+    % ===== Add content files here =====
+    \input{source/01-edge-detection.tex}
+    \input{source/02-classical-feature-extraction.tex}
+    \input{source/03-neural-network-basics.tex}
+    \input{source/04-convolutional-neural-networks.tex}
+    \input{source/05-semantic-segmentation.tex}
+    \input{source/06-object-detection.tex}
+    \input{source/07-instance-segmentation.tex}
+    % \input{source/others}
+
+\end{multicols*}
+
+\end{document}
