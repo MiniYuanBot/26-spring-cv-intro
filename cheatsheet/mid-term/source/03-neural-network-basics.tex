@@ -16,19 +16,40 @@ Parameters: $\theta\in\mathbb{R}^d$, $b\in\mathbb{R}$.
 \subsubsection*{MLP}
 Layer: $\mathbf{z}^{(\ell)}=\mathbf{W}^{(\ell)}\mathbf{a}^{(\ell-1)}+\mathbf{b}^{(\ell)}$, $\mathbf{a}^{(\ell)}=g_\ell(\mathbf{z}^{(\ell)})$.
 Activations: ReLU $\max(0,x)$ (default); LeakyReLU $\max(\alpha x,x)$; Sigmoid $\frac{1}{1+e^{-x}}$; tanh.
-MLP $\supseteq$ CNN in expressive power; CNN adds \textbf{inductive bias} for vision.
+
+\imgtriple{assets/04-deep-learning-1-02-sigmoid.png}{assets/04-deep-learning-1-03-tanh.png}{assets/04-deep-learning-1-04-relu.png}
+
+\imgbox[0.5\linewidth]{assets/04-deep-learning-1-01-neural-network.jpg}
+
+orange circles (Neurons, memory footprint); directed edges (parameters, parameter count).
+
+\subsection{Objective}
+\subsubsection*{Loss Functions}
+Sigmoid: $\sigma(z)=1/(1+e^{-z})$, $p(y=1|x;\theta)=\sigma(z_i)=h_i$;
+log-likelihood $\log p(Y|X;\theta)=\sum_{i=1}^n[y_i\log h_i+(1-y_i)\log(1-h_i)]$ (MLE maximizes it).
+Binary CE/NLL: $\mathcal{L}=-\frac{1}{n}\log p(Y|X;\theta)=-\frac{1}{n}\sum_{i=1}^n H(y_i,h_i)$.
+Softmax: $\hat{y}_j=e^{\beta z_j}/\sum_{k=1}^K e^{\beta z_k}$ (stable: $z_j\leftarrow z_j-\max\mathbf{z}$; $\beta\to\infty$ gives one-hot).
+Multi-class CE: $\mathcal{L}=-\frac{1}{n}\sum_{i,k} y_k^{(i)}\log\hat{y}_k^{(i)}$; for one-hot $c$, $-\log\hat{y}_c$.
+Entropy $H(P)=-\sum_x P(x)\log P(x)$, cross-entropy $H(P,Q)=-\sum_x P(x)\log Q(x)$,
+KL $D_{\mathrm{KL}}(P\|Q)=H(P,Q)-H(P)=\sum_x P(x)\log\frac{P(x)}{Q(x)}$.
+Target $P$ (one-hot/soft), prediction $Q=\hat{y}$; minimizing CE equals minimizing KL.
+
+\subsubsection*{Regularization}
+L2: $\ell=\sum\Delta_i^2$ (weight decay; sensitive to outliers; quadratic shrinkage).
+L1: $\ell=\sum|\Delta_i|$ (robust, constant gradient, induces sparsity).
+Smooth L1 (Huber): $\text{smooth}_{L1}(x)=0.5x^2$ if $|x|<1$, else $|x|-0.5$. Best of both: robust to outliers + smooth near zero.
 
 \subsection{Optimization}
-\subsubsection*{Loss Functions}
-Binary cross-entropy (NLL): \newline
-$\mathcal{L}=-\frac{1}{n}\sum_{i=1}^n[y^{(i)}\log h^{(i)}+(1-y^{(i)})\log(1-h^{(i)})]$.
-With L2 regularization: $\mathcal{L}_{\text{reg}}=\mathcal{L}+\frac{\lambda}{2}\|\theta\|^2$.
-Multi-class: Softmax + cross-entropy. KL divergence: $D_{KL}(P\|Q)=H(P,Q)-H(P)$.
-
 \subsubsection*{Backpropagation}
-Output layer (sigmoid + BCE): $\boldsymbol{\delta}^{(L)}=\mathbf{a}^{(L)}-\mathbf{y}$.
-Hidden layers: $\boldsymbol{\delta}^{(\ell)}=((\mathbf{W}^{(\ell+1)})^T\boldsymbol{\delta}^{(\ell+1)})\odot g_\ell'(\mathbf{z}^{(\ell)})$.
-Gradients: $\frac{\partial\mathcal{L}}{\partial\mathbf{W}^{(\ell)}}=\boldsymbol{\delta}^{(\ell)}(\mathbf{a}^{(\ell-1)})^T$, $\frac{\partial\mathcal{L}}{\partial\mathbf{b}^{(\ell)}}=\boldsymbol{\delta}^{(\ell)}$.
+Logistic: $z=\theta^\top x$, $h=\sigma(z)$, $\ell=-[y\log h+(1-y)\log(1-h)]$.
+$\partial\ell/\partial z=h-y$ via $\partial\ell/\partial h=-(y/h-(1-y)/(1-h))$ and $\sigma'(z)=h(1-h)$.
+$\nabla_\theta\ell=(h-y)x$. Batch: $\nabla_\theta\mathcal{L}=\frac{1}{n}X^\top(H-Y)$.
+
+MLP: $\mathbf{z}^{(\ell)}=\mathbf{W}^{(\ell)}\mathbf{a}^{(\ell-1)}+\mathbf{b}^{(\ell)}$, $\mathbf{a}^{(\ell)}=g_\ell(\mathbf{z}^{(\ell)})$.
+$\boldsymbol{\delta}^{(\ell)}=\partial\mathcal{L}/\partial\mathbf{z}^{(\ell)}$.
+Output (sigmoid+BCE): $\boldsymbol{\delta}^{(L)}=\mathbf{a}^{(L)}-\mathbf{y}$ because $\partial\ell/\partial a=-y/a+(1-y)/(1-a)$ cancels with $g_L'=a(1-a)$.
+Hidden: $\boldsymbol{\delta}^{(\ell)}=((\mathbf{W}^{(\ell+1)})^\top\boldsymbol{\delta}^{(\ell+1)})\odot g_\ell'(\mathbf{z}^{(\ell)})$.
+$\partial\mathcal{L}/\partial\mathbf{W}^{(\ell)}=\boldsymbol{\delta}^{(\ell)}(\mathbf{a}^{(\ell-1)})^\top$, $\partial\mathcal{L}/\partial\mathbf{b}^{(\ell)}=\boldsymbol{\delta}^{(\ell)}$.
 
 \subsubsection*{Optimizers}
 SGD: $\theta_{t+1}=\theta_t-\alpha g_t$.

@@ -3,24 +3,22 @@
 \subsubsection*{FCN Encoder}
 Encoder $E_\theta:\mathcal{X}\to\mathcal{Z}$ downsamples by total factor $D=\prod s_\ell$. Bottleneck size $H_L=\lfloor H_0/D\rfloor$, $W_L=\lfloor W_0/D\rfloor$.
 Decoder $D_\phi$ upsamples back to original size. Segmentation output: $\hat y\in\mathbb{R}^{K\times H_0\times W_0}$.
-Seg loss: pixel-wise cross-entropy over $K$ classes.
 
 \subsubsection*{Non-learnable Upsampling}
-Bilinear: interpolate from source coordinates.
+Bilinear interpolate.
 Nearest neighbor: replicate each pixel to $r\times r$ block.
-Max unpooling: record max positions during pooling; place values back, fill others with 0.
+Max unpooling: record maxpool indices, scatter back, zero-fill (so pair with maxpool).
 
 \subsubsection*{Transposed Convolution}
-Equivalent to conv after zero-insertion and padding. Output size: $h_{out}'=s(h_{in}'-1)+a+k-2p$.
+$y=w*x=\mathbf{C}x$, transpose $x=w*^\top y=\mathbf{C}^\top y$.
+Equivalent ordinary conv: insert $s-1$ zeros between pixels; surround-pad $k-p-1$ zeros; extra bottom/right pad $a=(h_{\text{in}}+2p-k)\bmod s$ if needed; then conv stride 1.
+Output: $h_{\text{out}}'=s(h_{\text{in}}'-1)+a+k-2p$.
 Checkerboard artifact when $k$ not divisible by $s$.
-Alternatives: resize-conv (upsample then $3\times3$ conv), PixelShuffle.
 
 \subsection{UNet}
 \subsubsection*{Skip Connections}
-Concatenate encoder features to decoder at same resolution. Bottleneck handles global context; skip links provide per-pixel spatial detail.
-
-\subsubsection*{Information Split}
-Encoder-Decoder alone forces bottleneck to carry both context and spatial info. Skip links split the burden, improving optimization.
+Skip links: concat encoder features to decoder at same resolution, splitting the burden—bottleneck carries \textbf{global context}, skips inject \textbf{per-pixel spatial detail}.
+Without them, the bottleneck must encode both, degrading optimization.
 
 \subsection{Segmentation Evaluation}
 \subsubsection*{Overlap Metrics}

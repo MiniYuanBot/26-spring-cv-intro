@@ -36,10 +36,10 @@
 
 % 4. Section headings — use \def to preserve *-version handling via \@startsection
 \def\section{%
-    \@startsection{section}{1}{0mm}
-    {.2ex plus .1ex minus .05ex}
-    {.1ex plus .05ex}
-    {\color{myblue}\sffamily\fontsize{7.5pt}{8pt}\selectfont\bfseries\zihao{6}}}
+  \@startsection{section}{1}{0mm}
+  {.2ex plus .1ex minus .05ex}
+  {.1ex plus .05ex}
+  {\color{myblue}\sffamily\fontsize{7.5pt}{8pt}\selectfont\bfseries\zihao{6}}}
 \def\subsection{%
     \@startsection{subsection}{2}{0mm}
     {.1ex plus .05ex minus .02ex}
@@ -66,29 +66,66 @@
 \setlength{\parskip}{0.5pt plus 0.5pt minus 0.5pt}
 
 % ========== Custom Commands ==========
-% \tightlist
-\providecommand{\tightlist}{%
-    \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
-
-% Highlighted formula box
-\newcommand{\formelbox}[1]{%
-    \begin{center}
-        \fbox{\parbox{0.9\columnwidth}{%
-                \centering
-                \color{myblue}
-                \fontsize{7pt}{7.5pt}\selectfont
-                $#1$
-            }}
-    \end{center}
-    \vspace{0.2mm}
+% Compact image insert (no float, works inside multicols)
+\newcommand{\imgbox}[2][\linewidth]{%
+    \par
+    \vspace{0.2mm}%
+    {\centering
+        \includegraphics[width=#1]{#2}%
+        \par
+    }
+    \vspace{0.2mm}%
 }
 
+% 2-up: \imgpair[width]{left-img}{right-img}
+\newcommand{\imgpair}[3][0.48\linewidth]{%
+    \par\noindent
+    \begin{minipage}[t]{#1}%
+        \centering\includegraphics[width=\hsize]{#2}%
+    \end{minipage}%
+    \hfill
+    \begin{minipage}[t]{#1}%
+        \centering\includegraphics[width=\hsize]{#3}%
+    \end{minipage}%
+    \par\vspace{0.2mm}%
+}
+
+% 3-up: \imgtriple[width]{img1}{img2}{img3}
+\newcommand{\imgtriple}[4][0.31\linewidth]{%
+    \par\noindent
+    \begin{minipage}[t]{#1}%
+        \centering\includegraphics[width=\hsize]{#2}%
+    \end{minipage}%
+    \hfill
+    \begin{minipage}[t]{#1}%
+        \centering\includegraphics[width=\hsize]{#3}%
+    \end{minipage}%
+    \hfill
+    \begin{minipage}[t]{#1}%
+        \centering\includegraphics[width=\hsize]{#4}%
+    \end{minipage}%
+    \par\vspace{0.2mm}%
+}
+
+% Highlighted formula box
+% \newcommand{\formelbox}[1]{%
+%     \begin{center}
+%         \fbox{\parbox{0.9\columnwidth}{%
+%                 \centering
+%                 \color{myblue}
+%                 \fontsize{7pt}{7.5pt}\selectfont
+%                 $#1$
+%             }}
+%     \end{center}
+%     \vspace{0.2mm}
+% }
+
 % Compact list environment (itemize is already compressed globally via \@listI)
-\newenvironment{compactlist}
-{\begin{list}{\textbullet}{%
-            \setlength{\leftmargin}{0.5em}%
-            \setlength{\itemsep}{0pt}%
-            \setlength{\parsep}{0pt}%
-            \setlength{\topsep}{0pt}%
-            \setlength{\partopsep}{0pt}}}
-        {\end{list}}
+% \newenvironment{compactlist}
+% {\begin{list}{\textbullet}{%
+%         \setlength{\leftmargin}{0.5em}%
+%         \setlength{\itemsep}{0pt}%
+%         \setlength{\parsep}{0pt}%
+%         \setlength{\topsep}{0pt}%
+%         \setlength{\partopsep}{0pt}}}
+% {\end{list}}

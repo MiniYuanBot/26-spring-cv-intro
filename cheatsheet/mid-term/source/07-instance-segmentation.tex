@@ -1,19 +1,25 @@
 \section{Instance Segmentation}
 \subsection{Mask R-CNN Pipeline}
-\subsubsection*{Three-Head Architecture}
-Based on Faster R-CNN with added mask head. Pipeline: Backbone $\to$ RPN $\to$ RoIAlign $\to$ three parallel heads: cls, reg, mask.
+\subsubsection*{Architecture}
+\textbf{Top-down} Architecture. Based on Faster R-CNN with added mask head. Three parallel heads: cls, reg, mask.
 Training: mask head supervised only on positive RoIs.
 
 \subsubsection*{RoIAlign}
-Avoids quantization of RoI Pool. Steps: (1) keep floating-point proposal locations; (2) divide into bins; (3) sample 4 points per bin with bilinear interpolation; (4) pool (max/avg). Significant AP gain, especially at high IoU thresholds.
+Avoid quantization of RoI Pool.
+(1) keep float proposal locations;
+(2) divide into bins;
+(3) sample 4 points per bin with bilinear interpolation;
+(4) pool (max/avg).
+Significant AP gain, especially at high IoU thresholds.
 
 \subsection{Mask Head Design}
 \subsubsection*{Output Strategy}
-Use per-pixel Sigmoid (independent binary classification) instead of Softmax across classes. Avoids class competition since cls head already decides category; mask head focuses purely on shape.
+Use per-pixel Sigmoid (independent binary classification) instead of Softmax across classes.
+Avoids class competition since cls head already decides category; mask head focuses purely on shape.
 
 \subsubsection*{Channel Strategy}
-Class-specific: output $K$ channels, one binary mask per class. Parameters scale with $K$.
-Class-agnostic: single shared mask channel. Mask R-CNN uses class-specific $K$ channels but only the channel predicted by cls head is used for loss and inference.
+Class-specific: $K$ binary mask channels, params $\propto K$. Class-agnostic: single shared mask.
+Mask R-CNN: $K$ channels but only the cls-selected one is used for loss and inference.
 
 \subsubsection*{Loss}
 Per-pixel binary cross-entropy over $m\times m$ mask (e.g., $28\times28$):
